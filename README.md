@@ -313,21 +313,6 @@ Accéder à l'application : [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## Membres de l'Équipe
-
-| # | Membre | Tâche | Description |
-|---|---|---|---|
-| 3 | **Hadil Barzani** | Smart Contract | Développement du contrat Solidity |
-| 21 | **Taha Hajji** | Backend | API, Ethers.js, service blockchain |
-| 11 | **Ibtissam EL ASSLOUJ** | Frontend | Interfaces utilisateur |
-| 12 | **Meryem EL ATIFI** | QR Code & Historique | Génération QR, affichage historique |
-| 6 | **Ibrahim Bouaicha** | Module IA | Prédiction retards, analyse anomalies |
-| 17 | **Hind ELYOUBI** | Tests & Documentation | Validation, tests, documentation |
-
-Groupe **2** — Projet de traçabilité de produits basé sur la blockchain.
-
----
-
 ## Licence
 
 MIT © 2026 TraceChain
