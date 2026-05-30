@@ -9,6 +9,7 @@ const productRoutes = require("./routes/products");
 const venteRoutes = require("./routes/ventes");
 const historyRoutes = require("./routes/history");
 const qrcodeRoutes = require("./routes/qrcode");
+const mlRoutes = require("./routes/ml");
 
 const path = require("path");
 
@@ -26,6 +27,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/ventes", venteRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/qrcode", qrcodeRoutes);
+app.use("/api/ml", mlRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
