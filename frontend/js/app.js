@@ -20,49 +20,49 @@ function showResult(containerId, html, type) {
 }
 
 function showSuccess(id, msg) { showResult(id, msg, "success"); }
-function showError(id, msg) { showResult(id, msg, "error"); }
+function showError(id, msg)   { showResult(id, msg, "error"); }
 
 function renderCard(title, content) {
   return `<div class="card"><h2>${title}</h2>${content}</div>`;
 }
 
-function renderForm(fields, submitLabel) {
-  let html = "";
-  for (const f of fields) {
-    html += `<div class="form-group"><label>${f.label}</label>`;
-    if (f.type === "select") {
-      html += `<select id="${f.id}">`;
-      for (const o of f.options) html += `<option value="${o.value}">${o.label}</option>`;
-      html += `</select>`;
-    } else {
-      html += `<input type="${f.type || "text"}" id="${f.id}" placeholder="${f.placeholder || ""}">`;
-    }
-    html += `</div>`;
-  }
-  html += `<button onclick="${submitLabel}">${submitLabel}</button>`;
-  return html;
-}
-
-function renderView(html) {
-  return html;
-}
-
-// =========================
-// ROUTING
-// =========================
+// ── ROUTING ──
 const pages = {
-  admin: renderAdmin,
-  producteur: renderProducteur,
+  admin:        renderAdmin,
+  producteur:   renderProducteur,
   transporteur: renderTransporteur,
-  client: renderClient,
-  scan: renderScan,
+  client:       renderClient,
+  scan:         renderScan,
+};
+
+const pageLabels = {
+  admin:        { icon: '⚙️', label: 'Administration', desc: 'Déploiement du contrat et gestion des rôles' },
+  producteur:   { icon: '🏭', label: 'Producteur', desc: 'Gestion des produits, stocks et ventes' },
+  transporteur: { icon: '🚚', label: 'Transporteur', desc: 'Suivi et mise à jour du transport' },
+  client:       { icon: '📦', label: 'Client', desc: 'Confirmation de livraison et historique' },
+  scan:         { icon: '📷', label: 'Scanner QR', desc: 'Vérifier l\'authenticité d\'un produit' },
 };
 
 function navigate(page) {
+  // Update active link
+  document.querySelectorAll('#nav-links a').forEach(a => {
+    a.classList.toggle('active', a.dataset.page === page);
+  });
+
   if (pages[page]) {
     pages[page]();
-    if (page === "scan") startQrScanner();
+    if (page === 'scan') startQrScanner();
   }
+}
+
+function pageHeader(page) {
+  const p = pageLabels[page];
+  return `
+    <div class="page-header">
+      <h2><span class="icon">${p.icon}</span>${p.label}</h2>
+      <p>${p.desc}</p>
+    </div>
+  `;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -72,12 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
       navigate(link.dataset.page);
     });
   });
-  // Check URL param for scan
+
   const params = new URLSearchParams(window.location.search);
   const scanRef = params.get("scan");
   if (scanRef) {
     navigate("scan");
   } else {
-    renderAdmin();
+    navigate("admin");
   }
 });

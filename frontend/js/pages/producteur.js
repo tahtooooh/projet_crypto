@@ -1,149 +1,255 @@
 function renderProducteur() {
-  const content = $(`content`);
+  const content = $('content');
 
-  const addCard = renderCard(`Ajouter un produit`, `
-    <div class="form-group"><label>Référence</label><input type="text" id="p-ref" placeholder="REF-001"></div>
-    <div class="form-group"><label>Nom</label><input type="text" id="p-nom" placeholder="Produit X"></div>
-    <div class="form-group"><label>Origine</label><input type="text" id="p-origine" placeholder="Maroc"></div>
-    <div class="form-group"><label>Stock</label><input type="number" id="p-stock" placeholder="100"></div>
-    <button onclick="addProduct()">Ajouter</button>
-    <div id="p-add-result" style="margin-top:0.5rem"></div>
-  `);
-
-  const prodCard = renderCard(`Mise à jour production`, `
-    <div class="form-group"><label>ID Produit</label><input type="number" id="pu-id" placeholder="1"></div>
-    <div class="form-group"><label>Étape</label><input type="text" id="pu-etape" placeholder="Assemblage"></div>
-    <button onclick="updateProduction()">Mettre à jour</button>
-    <div id="pu-result" style="margin-top:0.5rem"></div>
-  `);
-
-  const finalCard = renderCard(`Finaliser produit`, `
-    <div class="form-group"><label>ID Produit</label><input type="number" id="pf-id" placeholder="1"></div>
-    <button onclick="finalizeProduct()">Finaliser</button>
-    <div id="pf-result" style="margin-top:0.5rem"></div>
-  `);
-
-  const venteCard = renderCard(`Créer une vente`, `
-    <div class="form-group"><label>ID Produit</label><input type="number" id="v-prodid" placeholder="1"></div>
-    <div class="form-group"><label>Client (adresse)</label><input type="text" id="v-client" placeholder="0x..."></div>
-    <div class="form-group"><label>Adresse livraison</label><input type="text" id="v-adresse" placeholder="Casablanca"></div>
-    <div class="form-group"><label>Quantité</label><input type="number" id="v-qte" placeholder="10"></div>
-    <button onclick="createVente()">Créer la vente</button>
-    <div id="v-result" style="margin-top:0.5rem"></div>
-  `);
-
-  const assignCard = renderCard(`Assigner transporteur`, `
-    <div class="form-group"><label>ID Vente</label><input type="number" id="ta-vid" placeholder="1"></div>
-    <div class="form-group"><label>Transporteur (adresse)</label><input type="text" id="ta-addr" placeholder="0x..."></div>
-    <button onclick="assignTransport()">Assigner</button>
-    <div id="ta-result" style="margin-top:0.5rem"></div>
-  `);
-
-  const resolveCard = renderCard(`Résoudre un problème`, `
-    <div class="form-group"><label>ID Vente</label><input type="number" id="rs-vid" placeholder="1"></div>
-    <div class="form-group"><label>Résolution</label>
-      <select id="rs-type">
-        <option value="1">Remise</option>
-        <option value="2">Remboursement</option>
-        <option value="3">Remplacement</option>
-        <option value="4">Annulation</option>
-      </select>
+  const addCard = renderCard('Ajouter un produit', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Référence</label>
+        <input type="text" id="p-ref" placeholder="REF-001">
+      </div>
+      <div class="form-group">
+        <label>Nom du produit</label>
+        <input type="text" id="p-nom" placeholder="Produit X">
+      </div>
+      <div class="form-group">
+        <label>Origine</label>
+        <input type="text" id="p-origine" placeholder="Maroc">
+      </div>
+      <div class="form-group">
+        <label>Stock initial</label>
+        <input type="number" id="p-stock" placeholder="100">
+      </div>
     </div>
-    <div class="form-group"><label>Note</label><input type="text" id="rs-note" placeholder="Produit endommagé"></div>
-    <button onclick="resolveProblem()">Résoudre</button>
-    <div id="rs-result" style="margin-top:0.5rem"></div>
+    <button onclick="addProduct()">➕ Ajouter le produit</button>
+    <div id="p-add-result" style="margin-top:0.8rem"></div>
+    <div id="p-qrcode"></div>
   `);
 
-  const viewCard = renderCard(`Consulter un produit`, `
-    <div class="form-group"><label>ID Produit</label><input type="number" id="pv-id" placeholder="1"></div>
-    <button onclick="viewProduct()">Voir</button>
-    <pre id="pv-result" style="margin-top:0.5rem"></pre>
+  const prodCard = renderCard('Mise à jour production', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ID Produit</label>
+        <input type="number" id="pu-id" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label>Étape de production</label>
+        <input type="text" id="pu-etape" placeholder="Assemblage">
+      </div>
+    </div>
+    <button onclick="updateProduction()">🔄 Mettre à jour</button>
+    <div id="pu-result" style="margin-top:0.8rem"></div>
   `);
 
-  content.innerHTML = addCard + prodCard + finalCard + venteCard + assignCard + resolveCard + viewCard;
+  const finalCard = renderCard('Finaliser un produit', `
+    <div class="form-group">
+      <label>ID Produit</label>
+      <input type="number" id="pf-id" placeholder="1">
+    </div>
+    <button onclick="finalizeProduct()" class="btn-success">✅ Finaliser la production</button>
+    <div id="pf-result" style="margin-top:0.8rem"></div>
+  `);
+
+  const venteCard = renderCard('Créer une vente', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ID Produit</label>
+        <input type="number" id="v-prodid" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label>Quantité</label>
+        <input type="number" id="v-qte" placeholder="10">
+      </div>
+      <div class="form-group full">
+        <label>Adresse client (wallet)</label>
+        <input type="text" id="v-client" placeholder="0x...">
+      </div>
+      <div class="form-group full">
+        <label>Adresse de livraison</label>
+        <input type="text" id="v-adresse" placeholder="Casablanca, Maroc">
+      </div>
+    </div>
+    <button onclick="createVente()">🛒 Créer la vente</button>
+    <div id="v-result" style="margin-top:0.8rem"></div>
+  `);
+
+  const assignCard = renderCard('Assigner un transporteur', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ID Vente</label>
+        <input type="number" id="ta-vid" placeholder="1">
+      </div>
+      <div class="form-group full">
+        <label>Adresse transporteur (wallet)</label>
+        <input type="text" id="ta-addr" placeholder="0x...">
+      </div>
+    </div>
+    <button onclick="assignTransport()">🚚 Assigner</button>
+    <div id="ta-result" style="margin-top:0.8rem"></div>
+  `);
+
+  const resolveCard = renderCard('Résoudre un problème', `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ID Vente</label>
+        <input type="number" id="rs-vid" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label>Type de résolution</label>
+        <select id="rs-type">
+          <option value="1">💰 Remise</option>
+          <option value="2">↩️ Remboursement</option>
+          <option value="3">🔄 Remplacement</option>
+          <option value="4">❌ Annulation</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Note explicative</label>
+        <input type="text" id="rs-note" placeholder="Produit endommagé lors du transport">
+      </div>
+    </div>
+    <button onclick="resolveProblem()" class="btn-danger">🛠️ Résoudre</button>
+    <div id="rs-result" style="margin-top:0.8rem"></div>
+  `);
+
+  const viewCard = renderCard('Consulter un produit', `
+    <div class="form-group">
+      <label>ID Produit</label>
+      <input type="number" id="pv-id" placeholder="1">
+    </div>
+    <button onclick="viewProduct()" class="btn-outline">🔍 Consulter</button>
+    <div id="pv-result" style="margin-top:0.8rem"></div>
+  `);
+
+  content.innerHTML = pageHeader('producteur') + addCard + prodCard + finalCard + venteCard + assignCard + resolveCard + viewCard;
 }
-
-let lastProductRef = "";
 
 async function addProduct() {
   try {
     const ref = $("p-ref").value;
+    if (!ref) return showError("p-add-result", "Référence requise");
     const d = await api("POST", "/products", {
-      ref, nom: $("p-nom").value,
-      origine: $("p-origine").value, stock: Number($("p-stock").value),
+      ref,
+      nom: $("p-nom").value,
+      origine: $("p-origine").value,
+      stock: Number($("p-stock").value),
     });
-    lastProductRef = ref;
-    const msg = `Produit ajouté! ID: ${d.productId} (tx: ${d.txHash.slice(0,20)}...)`;
-    showSuccess("p-add-result", msg);
+    showSuccess("p-add-result", `Produit ajouté — ID: <strong>${d.productId}</strong> | tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
     showQRCode(ref, d.productId);
-  } catch (e) { showError("p-add-result", e.message); }
+  } catch (e) {
+    showError("p-add-result", e.message);
+  }
 }
 
 function showQRCode(ref, id) {
-  const div = document.getElementById("p-qrcode") || (() => {
-    const el = document.createElement("div");
-    el.id = "p-qrcode";
-    el.style.marginTop = "1rem";
-    document.getElementById("p-add-result").after(el);
-    return el;
-  })();
+  const div = $("p-qrcode");
   div.innerHTML = `
-    <h3>QR Code du produit</h3>
-    <img src="/api/qrcode/${encodeURIComponent(ref)}"
-         alt="QR Code" style="width:150px;height:150px;">
-    <p style="margin-top:0.5rem;font-size:0.85rem;color:#666;">Réf: ${ref} | ID: ${id}</p>
-    <p style="font-size:0.8rem;color:#999;">Scannez pour voir l'historique</p>`;
+    <div class="qr-container">
+      <span class="badge badge-green">✓ QR Généré</span>
+      <img src="/api/qrcode/${encodeURIComponent(ref)}" alt="QR Code">
+      <span class="qr-ref">${ref}</span>
+      <span class="qr-label">ID produit : ${id} — Scannez pour voir l'historique complet</span>
+    </div>`;
 }
 
 async function updateProduction() {
   try {
-    const d = await api("PUT", `/products/${$("pu-id").value}/production`, { etape: $("pu-etape").value });
-    showSuccess("pu-result", `Production mise à jour (tx: ${d.txHash.slice(0,20)}...)`);
-  } catch (e) { showError("pu-result", e.message); }
+    const id = $("pu-id").value;
+    const etape = $("pu-etape").value;
+    if (!id || !etape) return showError("pu-result", "ID et étape requis");
+    const d = await api("PUT", `/products/${id}/production`, { etape });
+    showSuccess("pu-result", `Production mise à jour — tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
+  } catch (e) {
+    showError("pu-result", e.message);
+  }
 }
 
 async function finalizeProduct() {
   try {
-    const d = await api("PUT", `/products/${$("pf-id").value}/finalize`);
-    showSuccess("pf-result", `Produit finalisé (tx: ${d.txHash.slice(0,20)}...)`);
-  } catch (e) { showError("pf-result", e.message); }
+    const id = $("pf-id").value;
+    if (!id) return showError("pf-result", "ID requis");
+    const d = await api("PUT", `/products/${id}/finalize`);
+    showSuccess("pf-result", `Produit finalisé — tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
+  } catch (e) {
+    showError("pf-result", e.message);
+  }
 }
 
 async function createVente() {
   try {
     const d = await api("POST", "/ventes", {
-      productId: Number($("v-prodid").value), client: $("v-client").value,
-      adresse: $("v-adresse").value, qte: Number($("v-qte").value),
+      productId: Number($("v-prodid").value),
+      client: $("v-client").value,
+      adresse: $("v-adresse").value,
+      qte: Number($("v-qte").value),
     });
-    showSuccess("v-result", `Vente créée! ID: ${d.venteId} (tx: ${d.txHash.slice(0,20)}...)`);
-  } catch (e) { showError("v-result", e.message); }
+    showSuccess("v-result", `Vente créée — ID: <strong>${d.venteId}</strong> | tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
+  } catch (e) {
+    showError("v-result", e.message);
+  }
 }
 
 async function assignTransport() {
   try {
-    const d = await api("PUT", `/ventes/${$("ta-vid").value}/transport/assign`, { transporteur: $("ta-addr").value });
-    showSuccess("ta-result", `Transporteur assigné (tx: ${d.txHash.slice(0,20)}...)`);
-  } catch (e) { showError("ta-result", e.message); }
+    const vid = $("ta-vid").value;
+    const addr = $("ta-addr").value;
+    if (!vid || !addr) return showError("ta-result", "ID vente et adresse requis");
+    const d = await api("PUT", `/ventes/${vid}/transport/assign`, { transporteur: addr });
+    showSuccess("ta-result", `Transporteur assigné — tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
+  } catch (e) {
+    showError("ta-result", e.message);
+  }
 }
 
 async function resolveProblem() {
   try {
-    const d = await api("POST", `/ventes/${$("rs-vid").value}/resolve`, {
-      resolution: Number($("rs-type").value), note: $("rs-note").value,
+    const vid = $("rs-vid").value;
+    if (!vid) return showError("rs-result", "ID vente requis");
+    const d = await api("POST", `/ventes/${vid}/resolve`, {
+      resolution: Number($("rs-type").value),
+      note: $("rs-note").value,
     });
-    showSuccess("rs-result", `Problème résolu (tx: ${d.txHash.slice(0,20)}...)`);
-  } catch (e) { showError("rs-result", e.message); }
+    showSuccess("rs-result", `Problème résolu — tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
+  } catch (e) {
+    showError("rs-result", e.message);
+  }
 }
 
 async function viewProduct() {
   try {
-    const d = await api("GET", `/products/${$("pv-id").value}`);
+    const id = $("pv-id").value;
+    if (!id) return showError("pv-result", "ID requis");
+    const d = await api("GET", `/products/${id}`);
     const ref = d.referenceProduit;
-    const qr = `<div style="text-align:center;margin-bottom:1rem">
-      <img src="/api/qrcode/${encodeURIComponent(ref)}"
-           alt="QR" style="width:130px;height:130px;">
-      <p style="font-size:0.85rem;color:#666;">Scan: ${ref}</p>
-    </div>`;
-    $("pv-result").innerHTML = qr + `<pre>${JSON.stringify(d, null, 2)}</pre>`;
-  } catch (e) { $("pv-result").textContent = "Erreur: " + e.message; }
+
+    const statutLabels = { 0: 'En production', 1: 'Finalisé', 2: 'En vente', 3: 'Expédié', 4: 'Livré' };
+    const statutBadge = `<span class="badge badge-cyan">${statutLabels[d.statut] || d.statut}</span>`;
+
+    $("pv-result").innerHTML = `
+      <div class="product-info" style="margin-top:0.5rem">
+        <div class="info-item">
+          <div class="info-label">Référence</div>
+          <div class="info-value">${ref}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Nom</div>
+          <div class="info-value">${d.nom}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Origine</div>
+          <div class="info-value">${d.origine}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Stock disponible</div>
+          <div class="info-value">${d.stockDisponible} / ${d.stockProduit}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">${statutBadge}</div>
+      <div class="qr-container" style="padding:1rem">
+        <img src="/api/qrcode/${encodeURIComponent(ref)}" alt="QR Code">
+        <span class="qr-ref">${ref}</span>
+      </div>
+    `;
+  } catch (e) {
+    showError("pv-result", e.message);
+  }
 }
