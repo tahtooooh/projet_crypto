@@ -1,0 +1,6 @@
+.env
+node_modules/
+cache/
+backend.log
+backend-err.log
+/artifacts/

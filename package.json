@@ -1,0 +1,22 @@
+{
+  "name": "tracechain",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
+    "backend": "node backend/src/index.js",
+    "compile": "npx hardhat compile"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "ethers": "^6.13.0",
+    "express": "^4.21.0",
+    "morgan": "^1.10.0",
+    "qrcode": "^1.5.4"
+  }
+}
