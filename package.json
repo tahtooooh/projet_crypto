@@ -5,6 +5,7 @@
   "scripts": {
     "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
     "backend": "node backend/src/index.js",
+    "ml": "python ml_service/app.py",
     "compile": "npx hardhat compile"
   },
   "devDependencies": {

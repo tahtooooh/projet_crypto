@@ -526,3 +526,12 @@ pre {
   .form-grid { grid-template-columns: 1fr; }
   .product-info { grid-template-columns: 1fr; }
 }
+.result-card {
+  text-align:center;padding:1.5rem;border-radius:var(--radius);margin-top:0.5rem;
+}
+.result-card.ok {
+  background:var(--green-light);border:1.5px solid var(--green-border);color:var(--green);
+}
+.result-card.delay {
+  background:var(--red-light);border:1.5px solid #fca5a5;color:var(--red);
+}

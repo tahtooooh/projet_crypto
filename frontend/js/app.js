@@ -32,6 +32,7 @@ const pages = {
   producteur:   renderProducteur,
   transporteur: renderTransporteur,
   client:       renderClient,
+  ml:           renderML,
 };
 
 const pageLabels = {
@@ -40,6 +41,7 @@ const pageLabels = {
   transporteur: { icon: '🚚', label: 'Transporteur', desc: 'Suivi et mise à jour du transport' },
   client:       { icon: '📦', label: 'Client', desc: 'Confirmation de livraison et historique' },
   scan:         { icon: '📷', label: 'Scanner QR', desc: 'Vérifier l\'authenticité d\'un produit' },
+  ml:           { icon: '🤖', label: 'ML Model', desc: 'Prédiction de retard logistique' },
 };
 
 function navigate(page) {
