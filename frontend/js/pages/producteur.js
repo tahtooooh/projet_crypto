@@ -125,31 +125,83 @@ function renderProducteur() {
 
 async function addProduct() {
   try {
-    const ref = $("p-ref").value;
+    const ref = $("p-ref").value.trim();
+    const nom = $("p-nom").value.trim();
+    const origine = $("p-origine").value.trim();
+    const stock = Number($("p-stock").value);
+
     if (!ref) return showError("p-add-result", "Référence requise");
-    const d = await api("POST", "/products", {
-      ref,
-      nom: $("p-nom").value,
-      origine: $("p-origine").value,
-      stock: Number($("p-stock").value),
-    });
-    showSuccess("p-add-result", `Produit ajouté — ID: <strong>${d.productId}</strong> | tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`);
-    showQRCode(ref, d.productId);
+    if (!nom) return showError("p-add-result", "Nom du produit requis");
+    if (!origine) return showError("p-add-result", "Origine requise");
+    if (!stock || stock <= 0) return showError("p-add-result", "Stock invalide");
+
+    $("p-add-result").innerHTML = `<p style="color:var(--text-secondary);font-size:0.88rem">⏳ Transaction en cours sur la blockchain...</p>`;
+    $("p-qrcode").innerHTML = "";
+
+    const d = await api("POST", "/products", { ref, nom, origine, stock });
+
+    showSuccess(
+      "p-add-result",
+      `Produit ajouté — ID: <strong>${d.productId}</strong> | tx: <span style="font-family:monospace">${d.txHash.slice(0,20)}...</span>`
+    );
+
+    await showQRCode(ref, d.productId, nom, origine, stock);
   } catch (e) {
     showError("p-add-result", e.message);
   }
 }
 
-function showQRCode(ref, id) {
+async function showQRCode(ref, id, nom, origine, stock) {
   const div = $("p-qrcode");
+  const qrUrl = `/api/qrcode/${encodeURIComponent(ref)}`;
+
   div.innerHTML = `
-    <div class="qr-container">
-      <span class="badge badge-green">✓ QR Généré</span>
-      <img src="/api/qrcode/${encodeURIComponent(ref)}" alt="QR Code">
+    <div class="qr-container" id="qr-result-block" style="animation:fadeUp 0.4s ease">
+      <span class="badge badge-green">✓ QR Code Généré</span>
+      <img id="qr-img-preview" src="${qrUrl}" alt="QR Code"
+           style="width:180px;height:180px;border-radius:var(--radius-sm);border:3px solid var(--accent);padding:8px;background:#fff;margin:0.6rem 0">
       <span class="qr-ref">${ref}</span>
-      <span class="qr-label">ID produit : ${id} — Scannez pour voir l'historique complet</span>
+      <span class="qr-label" style="margin-bottom:0.8rem">ID : ${id} · ${nom} · ${origine} · Stock : ${stock}</span>
+      <button id="qr-dl-btn" class="btn-outline"
+              onclick="downloadQRCode('${encodeURIComponent(ref)}', '${ref}')"
+              style="font-size:0.82rem;padding:6px 16px;margin-top:0.2rem">
+        ⬇️ Télécharger le QR Code (PNG)
+      </button>
+    </div>
+
+    <div id="qr-history-block" style="margin-top:1rem">
+      <h3 style="font-size:0.93rem;margin-bottom:0.6rem;color:var(--text-secondary)">📋 Historique initial enregistré</h3>
+      <p style="color:var(--text-muted);font-size:0.85rem">⏳ Chargement de l'historique...</p>
     </div>`;
+
+  try {
+    const history = await api("GET", `/history/product/${id}`);
+    const histBlock = document.getElementById("qr-history-block");
+
+    if (!history || history.length === 0) {
+      histBlock.innerHTML = `
+        <h3 style="font-size:0.93rem;margin-bottom:0.6rem;color:var(--text-secondary)">📋 Historique initial enregistré</h3>
+        <p style="color:var(--text-muted);font-size:0.85rem">Aucune entrée pour l'instant.</p>`;
+      return;
+    }
+
+    histBlock.innerHTML = `
+      <h3 style="font-size:0.93rem;margin-bottom:0.6rem;color:var(--text2)">
+        📋 Historique initial enregistré
+      </h3>
+      <div id="qr-hist-adv"></div>`;
+
+    renderHistoryAdvanced(history, "qr-hist-adv", { ref, nom });
+  } catch (err) {
+    const histBlock = document.getElementById("qr-history-block");
+    if (histBlock) {
+      histBlock.innerHTML = `
+        <h3 style="font-size:0.93rem;margin-bottom:0.6rem;color:var(--text-secondary)">📋 Historique initial enregistré</h3>
+        <p style="color:var(--red);font-size:0.85rem">Impossible de charger l'historique : ${err.message}</p>`;
+    }
+  }
 }
+
 
 async function updateProduction() {
   try {
@@ -245,8 +297,14 @@ async function viewProduct() {
       </div>
       <div style="margin-bottom:1rem">${statutBadge}</div>
       <div class="qr-container" style="padding:1rem">
-        <img src="/api/qrcode/${encodeURIComponent(ref)}" alt="QR Code">
+        <img src="/api/qrcode/${encodeURIComponent(ref)}" alt="QR Code"
+             style="width:180px;height:180px;border-radius:var(--radius-sm);border:3px solid var(--accent);padding:8px;background:#fff;margin:0.4rem 0">
         <span class="qr-ref">${ref}</span>
+        <button class="btn-outline"
+                onclick="downloadQRCode('${encodeURIComponent(ref)}', '${ref}')"
+                style="font-size:0.82rem;padding:6px 16px;margin-top:0.4rem">
+          ⬇️ Télécharger le QR Code (PNG)
+        </button>
       </div>
     `;
   } catch (e) {

@@ -1,5 +1,23 @@
 function renderTransporteur() {
   const content = $('content');
+  stopQrScanner(); // stoppe caméra si on revient sur cette page
+
+  // Scanner QR intégré : remplit automatiquement le champ ID Vente via référence
+  const scanCard = renderQRScanCard("t-qr-reader", "t-ref-scan", "t-qr-result");
+
+  const scanRefCard = renderCard('🔍 Rechercher une vente par référence', `
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:0.8rem">
+      Scannez le QR code ci-dessus ou entrez la référence produit pour trouver la vente associée.
+    </p>
+    <div class="form-group">
+      <label>Référence produit</label>
+      <input type="text" id="t-ref-scan" placeholder="REF-001" style="text-transform:uppercase">
+    </div>
+    <button id="t-ref-scan-search-btn" class="btn-outline" onclick="findVenteByRef()" style="font-size:0.85rem">
+      🔍 Trouver la vente
+    </button>
+    <div id="t-ref-result" style="margin-top:0.6rem"></div>
+  `);
 
   const updateCard = renderCard('Mettre à jour le transport', `
     <div class="step-indicator">
@@ -47,7 +65,37 @@ function renderTransporteur() {
     <div id="tv-result" style="margin-top:0.8rem"></div>
   `);
 
-  content.innerHTML = pageHeader('transporteur') + updateCard + viewCard;
+  content.innerHTML = pageHeader('transporteur') + scanCard + scanRefCard + updateCard + viewCard;
+}
+
+async function findVenteByRef() {
+  const ref = document.getElementById("t-ref-scan")?.value.trim().toUpperCase();
+  if (!ref) return showError("t-ref-result", "Entrez une référence produit");
+
+  document.getElementById("t-ref-result").innerHTML = `<p style="color:var(--text2);font-size:0.85rem">⏳ Recherche...</p>`;
+
+  try {
+    const product = await api("GET", `/products/ref/${encodeURIComponent(ref)}`);
+    // Récupère les ventes liées à ce produit pour trouver l'ID vente actif
+    const ventes = await api("GET", `/ventes?productId=${product.id}`);
+    const active = Array.isArray(ventes) ? ventes.find(v => v.statut < 4) : null;
+
+    if (active) {
+      // Auto-remplir le champ ID vente dans la section transport
+      const vidEl = document.getElementById("t-vid");
+      if (vidEl) vidEl.value = active.id;
+      document.getElementById("t-ref-result").innerHTML = `
+        <div class="success">
+          ✅ Vente trouvée : <strong>#${active.id}</strong> — ${product.nom}
+          <br><span style="font-size:0.8rem;color:var(--text2)">L'ID vente a été rempli automatiquement ci-dessous.</span>
+        </div>`;
+    } else {
+      document.getElementById("t-ref-result").innerHTML = `
+        <div class="error">Aucune vente active trouvée pour la référence <strong>${ref}</strong>.</div>`;
+    }
+  } catch (e) {
+    showError("t-ref-result", e.message);
+  }
 }
 
 function updateStepIndicator(val) {
